@@ -15,9 +15,19 @@ function pickOg(html: string, prop: string): string | undefined {
 
 export async function registerRoutes(app: Express): Promise<Server> {
 
-  app.get("/api/github/repos", async (_req: Request, res: Response) => {
+  app.get("/api/github/repos", async (req: Request, res: Response) => {
     try {
-      const githubUsername = process.env.GITHUB_USERNAME || "halimcho";
+      const githubUsername = String(
+        (req.query.username as string) || process.env.GITHUB_USERNAME || ""
+      ).trim();
+
+      if (!githubUsername) {
+        return res.status(400).json({
+          error: "missing_user",
+          hint: "Set env GITHUB_USERNAME or pass ?username=<github id>",
+        });
+      }
+
       const githubToken = process.env.GITHUB_TOKEN;
 
       const headers: Record<string, string> = {
@@ -26,13 +36,19 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
       if (githubToken) headers["Authorization"] = `token ${githubToken}`;
 
-      const response = await fetch(
-        `https://api.github.com/users/${githubUsername}/repos?sort=updated&per_page=6`,
-        { headers }
-      );
+      const url = `https://api.github.com/users/${encodeURIComponent(
+        githubUsername
+      )}/repos?sort=updated&per_page=6`;
+
+      const response = await fetch(url, { headers });
 
       if (!response.ok) {
-        throw new Error(`GitHub API responded with status: ${response.status}`);
+        const text = await response.text();
+        return res.status(response.status).json({
+          error: "github_api_error",
+          status: response.status,
+          body: text,
+        });
       }
 
       const repos = (await response.json()) as any[];
@@ -56,8 +72,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("GitHub API error:", error);
       res.status(500).json({
-        message: "Failed to fetch GitHub repositories",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: "internal_error",
+        message:
+          error instanceof Error ? error.message : "Failed to fetch repositories",
       });
     }
   });
@@ -116,7 +133,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       if (!response.ok) {
-        throw new Error(`Kakao API responded with status: ${response.status}`);
+        const text = await response.text();
+        throw new Error(
+          `Kakao API responded with status: ${response.status} body: ${text}`
+        );
       }
 
       const data = (await response.json()) as unknown;
@@ -130,7 +150,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  
+
   app.get("/api/place-preview", async (req: Request, res: Response) => {
     try {
       const url = String(req.query.url || "");
@@ -162,7 +182,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ error: "preview failed" });
     }
   });
-  
+
   const httpServer = createServer(app);
   return httpServer;
 }

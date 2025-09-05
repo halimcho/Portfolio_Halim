@@ -18,7 +18,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/github/repos", async (req: Request, res: Response) => {
     try {
       const githubUsername = String(
-        (req.query.username as string) || process.env.GITHUB_USERNAME || ""
+        (req.query.username as string) ?? process.env.GITHUB_USERNAME ?? "halimcho"
       ).trim();
 
       if (!githubUsername) {

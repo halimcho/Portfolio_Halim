@@ -1,0 +1,23 @@
+{
+  "css.validate": false,
+  "scss.validate": false,
+  "less.validate": false,
+
+
+  "tailwindCSS.experimental.configFile": "client/tailwind.config.cjs",
+
+  "files.associations": {
+    "*.css": "postcss"
+  },
+
+  "tailwindCSS.includeLanguages": {
+    "postcss": "css",
+    "css": "css",
+    "javascript": "javascript",
+    "typescript": "typescript",
+    "typescriptreact": "typescriptreact",
+    "javascriptreact": "javascriptreact"
+  },
+
+  "editor.quickSuggestions": { "strings": true }
+}

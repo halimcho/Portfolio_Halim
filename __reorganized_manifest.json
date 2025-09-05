@@ -1,0 +1,8 @@
+{
+  "copied_frontend": [
+    "frontend/app"
+  ],
+  "copied_backend": [
+    "backend/app"
+  ]
+}

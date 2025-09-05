@@ -1,0 +1,33 @@
+version: '3.9'
+services:
+  backend:
+    build: ./backend/app
+    working_dir: /app
+    env_file:
+      - ./backend/app/.env
+    environment:
+      - PORT=5001
+    ports:
+      - "5001:5001"
+    networks: [appnet]
+    command: sh -c "npm run dev"
+
+  frontend:
+    build: ./frontend/app
+    working_dir: /app
+    env_file:
+      - ./frontend/app/.env
+    environment:
+      - VITE_KAKAO_JS_KEY=efe45bd0fb232c98afd3a547dc360d84
+      - VITE_API_BASE_URL=http://backend:5001
+      - HOST=0.0.0.0
+      - PORT=5173
+    ports:
+      - "5173:5173"
+    depends_on: [backend]
+    networks: [appnet]
+    command: sh -c "npm run dev"
+
+networks:
+  appnet:
+    driver: bridge

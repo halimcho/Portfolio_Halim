@@ -1,0 +1,14 @@
+[
+  {
+    "title": "HeartBeat AI",
+    "description": "의료 데이터로 심전도 이상 탐지",
+    "stack": ["Python", "PyTorch", "FastAPI"],
+    "link": "https://github.com/halimcho/heartbeat-ai"
+  },
+  {
+    "title": "Portfolio v2",
+    "description": "React + Express + KakaoMap 통합",
+    "stack": ["React", "Vite", "Express", "Tailwind"],
+    "link": "https://github.com/halimcho/portfolio"
+  }
+]

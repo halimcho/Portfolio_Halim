@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+
+    "strict": true,
+    "noEmit": true,
+
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./client/src/*"],
+      "@shared/*": ["./shared/*"],
+      "@assets/*": ["./attached_assets/*"]
+    },
+
+    "types": ["vite/client", "react", "react-dom"],
+    "lib": ["esnext", "dom", "dom.iterable"]
+  },
+  "include": ["client/src/**/*", "shared/**/*", "vite-env.d.ts"],
+  "exclude": ["node_modules", "dist", "client_dist", "**/*.test.ts"]
+}

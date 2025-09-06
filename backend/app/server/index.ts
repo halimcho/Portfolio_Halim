@@ -20,10 +20,20 @@ app.use(
   })
 );
 app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
-app.use(morgan(process.env.NODE_ENV === "production" ? "combined" : "dev"));
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": ["'self'", "https://dapi.kakao.com"],
+        "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
+        "img-src": ["'self'", "data:", "https:", "https://*.daumcdn.net", "https://*.kakaocdn.net"],
+        "connect-src": ["'self'", "https://dapi.kakao.com", "https://api.github.com"],
+      },
+    },
   })
 );
 

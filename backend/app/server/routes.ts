@@ -14,7 +14,6 @@ function pickOg(html: string, prop: string): string | undefined {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
-
   app.get("/api/github/repos", async (req: Request, res: Response) => {
     try {
       const githubUsername = String(
@@ -31,10 +30,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const githubToken = process.env.GITHUB_TOKEN;
 
       const headers: Record<string, string> = {
-        Accept: "application/vnd.github.v3+json",
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "Portfolio-Website",
       };
-      if (githubToken) headers["Authorization"] = `token ${githubToken}`;
+      if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
 
       const url = `https://api.github.com/users/${encodeURIComponent(
         githubUsername
@@ -79,7 +79,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-
   app.post("/api/contact", async (req: Request, res: Response) => {
     try {
       const validatedData = insertContactSchema.parse(req.body);
@@ -102,7 +101,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     }
   });
-
 
   app.get("/api/kakao/location", async (req: Request, res: Response) => {
     try {
@@ -149,7 +147,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     }
   });
-
 
   app.get("/api/place-preview", async (req: Request, res: Response) => {
     try {

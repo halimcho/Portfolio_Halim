@@ -24,7 +24,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         Accept: "application/vnd.github.v3+json",
         "User-Agent": "Portfolio-Website",
       };
-      if (githubToken) headers["Authorization"] = `token ${githubToken}`;
+      if (githubToken) headers["Authorization"] = `Bearer ${githubToken}`;
+
 
       const response = await fetch(
         `https://api.github.com/users/${githubUsername}/repos?sort=updated&per_page=6`,

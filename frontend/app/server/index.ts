@@ -42,7 +42,7 @@ async function attachFrontend() {
       "script-src": ["'self'", "https://dapi.kakao.com"],
       "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
       "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
-      "img-src": ["'self'", "data:", "https:"],
+      "img-src": ["'self'", "data:", "https:", "https://*.daumcdn.net", "https://*.kakaocdn.net"],
       "connect-src": ["'self'", "https://dapi.kakao.com", "https://api.github.com"],
     },
   },

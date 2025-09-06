@@ -21,10 +21,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const githubToken = process.env.GITHUB_TOKEN;
 
       const headers: Record<string, string> = {
-        Accept: "application/vnd.github.v3+json",
-        "User-Agent": "Portfolio-Website",
-      };
-      if (githubToken) headers["Authorization"] = `Bearer ${githubToken}`;
+  Accept: "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28",
+  "User-Agent": "Portfolio-Website",
+};
+if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
 
 
       const response = await fetch(

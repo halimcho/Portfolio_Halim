@@ -14,47 +14,71 @@ function pickOg(html: string, prop: string): string | undefined {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  /**
+   * GitHub 최신 저장소 6개 가져오기
+   * - 토큰 있으면: /user/repos (private 포함) → owner=targetUser만 필터
+   * - 없거나 실패: /users/:username/repos (public만)
+   */
   app.get("/api/github/repos", async (req: Request, res: Response) => {
     try {
-      const githubUsername = String(
-        (req.query.username as string) ?? process.env.GITHUB_USERNAME ?? "halimcho"
-      ).trim();
-
-      if (!githubUsername) {
-        return res.status(400).json({
-          error: "missing_user",
-          hint: "Set env GITHUB_USERNAME or pass ?username=<github id>",
-        });
-      }
-
-      const githubToken = process.env.GITHUB_TOKEN;
+      const usernameFromQuery = (req.query.username as string | undefined)?.trim();
+      const envUsername = (process.env.GITHUB_USERNAME || "halimcho").trim();
+      const targetUser = (usernameFromQuery || envUsername).trim();
+      const token = process.env.GITHUB_TOKEN;
 
       const headers: Record<string, string> = {
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
         "User-Agent": "Portfolio-Website",
       };
-      if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
+      if (token) headers.Authorization = `Bearer ${token}`;
 
-      const url = `https://api.github.com/users/${encodeURIComponent(
-        githubUsername
-      )}/repos?sort=updated&per_page=6`;
+      let repos: any[] = [];
 
-      const response = await fetch(url, { headers });
-
-      if (!response.ok) {
-        const text = await response.text();
-        return res.status(response.status).json({
-          error: "github_api_error",
-          status: response.status,
-          body: text,
-        });
+      // 1) 인증 사용자 저장소 (private 포함)
+      if (token) {
+        const authedUrl =
+          "https://api.github.com/user/repos?affiliation=owner&visibility=all&sort=updated&per_page=100";
+        const r = await fetch(authedUrl, { headers });
+        if (r.ok) {
+          const all = (await r.json()) as any[];
+          repos = all
+            .filter(
+              (it) => it?.owner?.login?.toLowerCase() === targetUser.toLowerCase()
+            )
+            .sort(
+              (a, b) =>
+                +new Date(b?.updated_at ?? 0) - +new Date(a?.updated_at ?? 0)
+            )
+            .slice(0, 6);
+        } else {
+          console.warn(
+            "[github] /user/repos failed → fallback",
+            r.status,
+            await r.text()
+          );
+        }
       }
 
-      const repos = (await response.json()) as any[];
+      // 2) 폴백: 공개 저장소만
+      if (repos.length === 0) {
+        const publicUrl = `https://api.github.com/users/${encodeURIComponent(
+          targetUser
+        )}/repos?sort=updated&type=owner&per_page=6`;
+        const pub = await fetch(publicUrl, { headers });
+        if (!pub.ok) {
+          return res.status(pub.status).json({
+            error: "github_api_error",
+            status: pub.status,
+            body: await pub.text(),
+          });
+        }
+        repos = (await pub.json()) as any[];
+      }
 
+      // (선택) DB 저장 로직 유지
       await storage.clearGitHubRepos();
-      const storedRepos = await Promise.all(
+      const stored = await Promise.all(
         repos.map((repo) =>
           storage.createGitHubRepo({
             name: repo.name,
@@ -68,7 +92,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         )
       );
 
-      res.json(storedRepos);
+      res.json(stored);
     } catch (error) {
       console.error("GitHub API error:", error);
       res.status(500).json({

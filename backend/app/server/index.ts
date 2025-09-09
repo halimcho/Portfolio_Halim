@@ -12,6 +12,8 @@ dotenv.config();
 
 const app = express();
 
+app.set("trust proxy", 1);
+
 app.use(express.json());
 app.use(
   cors({
@@ -19,7 +21,17 @@ app.use(
     credentials: false,
   })
 );
-app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
+
+app.use(
+  rateLimit({
+    windowMs: 60 * 1000,
+    max: 120,
+    standardHeaders: true,
+    legacyHeaders: false,
+    // trust proxy 설정 시 기본 keyGenerator로 충분
+  })
+);
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -30,7 +42,13 @@ app.use(
         "script-src": ["'self'", "https://dapi.kakao.com"],
         "style-src": ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
         "font-src": ["'self'", "https://fonts.gstatic.com", "data:"],
-        "img-src": ["'self'", "data:", "https:", "https://*.daumcdn.net", "https://*.kakaocdn.net"],
+        "img-src": [
+          "'self'",
+          "data:",
+          "https:",
+          "https://*.daumcdn.net",
+          "https://*.kakaocdn.net",
+        ],
         "connect-src": ["'self'", "https://dapi.kakao.com", "https://api.github.com"],
       },
     },
@@ -52,9 +70,9 @@ async function start() {
     await setupVite(app, httpServer);
   }
 
-  const server = app.listen(port, () => {
+  const server = app.listen(port, "0.0.0.0", () => {
     console.log(
-      `Server running on http://localhost:${port} (mode=${process.env.NODE_ENV || "development"})`
+      `Server running on http://0.0.0.0:${port} (mode=${process.env.NODE_ENV || "development"})`
     );
   });
 

@@ -27,8 +27,6 @@ docker compose up
 - 백앤드:  http://localhost:5001
 
 
-
-
 4) 오류 나는 경우
 
 - 프론트에서 API 호출이 404/CORS

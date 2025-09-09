@@ -42,7 +42,7 @@
 
 실행 가능한 URL
 - 개발 환경: [http://localhost:5173](http://localhost:5173)  
-- 배포 (프론트) URL: https://luxury-wisp-2c9085.netlify.app
+- 배포 (프론트) URL: https://halimgoormportfolio.netlify.app/
 - 배포 (백엔드) URL: https://portfolio-halim.onrender.com
 ----------------
 

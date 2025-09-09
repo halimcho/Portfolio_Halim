@@ -59,26 +59,43 @@ export default function ContactSection({ language = "ko" }: { language?: Lang })
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
+  e.preventDefault();
+  setIsSubmitting(true);
 
-    try {
-      await apiRequest("POST", "/api/contact", formData);
-      toast({
-        title: L.toastOkTitle,
-        description: L.toastOkDesc,
-      });
-      setFormData({ name: "", email: "", subject: "", message: "" });
-    } catch (error) {
-      toast({
-        title: L.toastErrTitle,
-        description: L.toastErrDesc,
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
+  const payload = {
+    name: formData.name.trim(),
+    email: formData.email.trim(),
+    message: formData.message.trim(),
   };
+
+  if (!payload.name || !payload.email || !payload.message) {
+    toast({
+      title: L.toastErrTitle,
+      description: "이름, 이메일, 메시지를 모두 입력해주세요.",
+      variant: "destructive",
+    });
+    setIsSubmitting(false);
+    return;
+  }
+
+  try {
+    const res = await apiRequest("POST", "/api/contact", payload);
+
+    if (res?.ok === false) throw new Error("Request failed");
+    toast({ title: L.toastOkTitle, description: L.toastOkDesc });
+    setFormData({ name: "", email: "", subject: "", message: "" });
+  } catch (error) {
+    console.error("contact submit error:", error);
+    toast({
+      title: L.toastErrTitle,
+      description: L.toastErrDesc,
+      variant: "destructive",
+    });
+  } finally {
+    setIsSubmitting(false);
+  }
+};
+
 
   const socialLinks = [
     { icon: Github, href: `https://github.com/${import.meta.env.VITE_GITHUB_USERNAME || 'hcho0511'}`, label: "GitHub" },

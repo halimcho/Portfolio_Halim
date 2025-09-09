@@ -1,4 +1,3 @@
-// client/src/components/site-controls.tsx
 import { useEffect, useState } from "react";
 import { ChevronDown, Globe, Sun, Moon } from "lucide-react";
 import { useLanguage } from "@/context/language";
@@ -7,7 +6,6 @@ export default function SiteControls() {
   const [open, setOpen] = useState(false);
   const { language, setLanguage } = useLanguage();
 
-  // 테마 제어 (html.class에 dark 토글)
   const [isDark, setIsDark] = useState<boolean>(
     document.documentElement.classList.contains("dark")
   );
@@ -29,7 +27,6 @@ export default function SiteControls() {
 
       {open && (
         <div className="mt-3 w-80 rounded-xl bg-slate-800 text-white p-4 shadow-2xl ring-1 ring-black/10">
-          {/* 언어 */}
           <div className="mb-4">
             <div className="flex items-center gap-2 mb-2 text-sm opacity-90">
               <Globe className="h-4 w-4" />
@@ -59,7 +56,6 @@ export default function SiteControls() {
             </div>
           </div>
 
-          {/* 테마 */}
           <div>
             <div className="flex items-center gap-2 mb-2 text-sm opacity-90">
               {isDark ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}

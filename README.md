@@ -116,13 +116,18 @@ Project
 
 배포 과정
 1. 프론트엔드(Netlify):
-   - npm run build 후 Netlify에 자동 배포
+  배포 트리거: GitHub push 시 자동 빌드/배포
+   - npm run build 후 Netlify에 자동 배포 (Publish directory: frontend/app/client_dist (프로젝트 구조에 맞게))
    - 환경변수(VITE_API_BASE_URL, VITE_KAKAO_JS_KEY)는 Netlify 대시보드에서 관리
 
-2. 백엔드(Render):  
-   - Dockerfile 기반 Express 서버 실행
-   - 환경변수(GITHUB_TOKEN, KAKAO_API_KEY)는 Render 대시보드에서 관리
-3. 로컬 개발:  
+3. 백엔드(Render):  
+   - 서비스 타입: Web Service (Node)
+   - Build Command: npm ci --include=dev && npm run build 또는 NPM_CONFIG_PRODUCTION=false npm ci && npm run build
+   - Start Command: npm run start (package.json → node dist/index.js)
+   - 환경변수(GITHUB_TOKEN, KAKAO_API_KEY,PORT=5001, GITHUB_USERNAME)는 Render 대시보드에서 관리
+   - 서버 코드 권장 설정 (app.set('trust proxy', 1) (프록시 환경에서 rate-limit/XFF 이슈 방지) -> Helmet CSP에 daumcdn.net, kakaocdn.net 허용 유지
+     
+4. 로컬 개발:  
    - docker-compose up --build → 로컬 환경에서 동시에 실행  
 
 운영 방법
@@ -132,9 +137,6 @@ Project
 
 ----------------
 
-6. 프로젝트 시연 영상 및 기술 발표 자료
-- 시연 영상: 
-- 발표 자료:
 
 영상에서는  
 1. 포트폴리오 소개 섹션
